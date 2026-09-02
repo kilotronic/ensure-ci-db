@@ -1,0 +1,55 @@
+name: Ensure CI Postgres
+description: Idempotent Postgres container on a host port for CI (Docker/OrbStack/Podman).
+branding:
+  icon: database
+  color: blue
+
+inputs:
+  port:
+    description: Host port to publish 5432 on.
+    required: false
+    default: "5433"
+  container:
+    description: Container name.
+    required: false
+    default: "ci-postgres"
+  image:
+    description: Postgres image.
+    required: false
+    default: "postgres:18-alpine"
+  database:
+    description: POSTGRES_DB
+    required: false
+    default: "ci"
+  user:
+    description: POSTGRES_USER
+    required: false
+    default: "ci"
+  password:
+    description: POSTGRES_PASSWORD
+    required: false
+    default: "ci"
+  cleanup:
+    description: If true, remove the container and exit (GitHub-hosted teardown).
+    required: false
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    - name: Ensure CI Postgres
+      shell: bash
+      env:
+        CI_PG_PORT: ${{ inputs.port }}
+        CI_PG_CONTAINER: ${{ inputs.container }}
+        CI_PG_IMAGE: ${{ inputs.image }}
+        CI_PG_DB: ${{ inputs.database }}
+        CI_PG_USER: ${{ inputs.user }}
+        CI_PG_PASSWORD: ${{ inputs.password }}
+      run: |
+        SCRIPT="$GITHUB_ACTION_PATH/ensure-ci-db.sh"
+        if [ "${{ inputs.cleanup }}" = "true" ]; then
+          bash "$SCRIPT" --cleanup
+        else
+          bash "$SCRIPT"
+        fi
