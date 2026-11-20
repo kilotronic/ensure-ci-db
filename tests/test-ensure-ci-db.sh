@@ -32,12 +32,12 @@ fi
 : >"$MOCK_LOG"
 cat >"$MOCK/customct" <<'EOF'
 #!/bin/sh
-printf '%s\n' "$*" >>"${MOCK_LOG}"
+printf 'customct %s\n' "$*" >>"${MOCK_LOG}"
 exit 0
 EOF
 chmod +x "$MOCK/customct"
 CT="$MOCK/customct" CI_PG_CONTAINER=x bash "$ROOT/ensure-ci-db.sh" --cleanup
-if grep -qx "rm -f x" "$MOCK_LOG"; then
+if grep -qx "customct rm -f x" "$MOCK_LOG"; then
   pass "CT= override is honoured"
 else
   fail "CT log: $(cat "$MOCK_LOG")"
