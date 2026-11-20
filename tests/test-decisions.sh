@@ -51,7 +51,7 @@ case "\$1" in
   rm) # removing the container holding the port frees it
     if [ "\$3" = "\$(cat "$T/holder" 2>/dev/null)" ] && [ -e "$T/listener.pid" ]; then
       # Postgres is gone at once, even if the port takes a moment to close.
-      kill "\$(cat "$T/listener.pid")"; rm -f "$T/listener.pid" "$T/ready" || exit 97
+      kill "\$(cat "$T/listener.pid")"; rm -f "$T/listener.pid" "$T/ready"
     fi ;;
 esac
 exit 0
