@@ -50,7 +50,8 @@ case "\$1" in
   run) [ -e "$T/run-makes-ready" ] && touch "$T/ready" ;;
   rm) # removing the container holding the port frees it
     if [ "\$3" = "\$(cat "$T/holder" 2>/dev/null)" ] && [ -e "$T/listener.pid" ]; then
-      kill "\$(cat "$T/listener.pid")"; rm -f "$T/listener.pid" "$T/ready"
+      # Postgres is gone at once, even if the port takes a moment to close.
+      kill "\$(cat "$T/listener.pid")"; rm -f "$T/listener.pid" "$T/ready" || exit 97
     fi ;;
 esac
 exit 0
@@ -63,7 +64,7 @@ printf '#!/bin/sh\nexit 0\n' >"$T/bin/sleep"
 chmod +x "$T/bin/"*
 # Only these tools on PATH, so the host's own docker or pg_isready is never used.
 mkdir -p "$T/sys" "$T/sys-no-pg"
-for tool in bash dirname head seq cat printf touch; do
+for tool in bash dirname head seq cat printf touch rm; do
   ln -s "$(command -v "$tool")" "$T/sys/$tool"
   ln -s "$(command -v "$tool")" "$T/sys-no-pg/$tool"
 done
