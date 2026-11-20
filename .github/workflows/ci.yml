@@ -63,6 +63,8 @@ jobs:
           test -x container-runtime.sh
       - name: Unit tests
         run: bash tests/test-ensure-ci-db.sh
+      - name: Decisions for each state of the port (mock runtime)
+        run: bash tests/test-decisions.sh
 
   dogfood:
     name: Dogfood action
